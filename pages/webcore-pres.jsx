@@ -138,12 +138,11 @@ export default () => {
       5: []
     }
 
-    const outOfOffice = outOfOfficeRota[new Date().getDay()]
-    dropTeamMembers(outOfOffice)
+    return outOfOfficeRota[new Date().getDay()]
   }
 
   if (!regularDrop) {
-    regularOutOfOffice()
+    dropTeamMembers(regularOutOfOffice())
     setRegularDrop(true)
   }
 
@@ -188,7 +187,7 @@ export default () => {
   const thanosButton = (
     <Button onClick={() => reduceTeam(teamToDrop)}>
       <ButtonText>{
-        `Thanos Mode (less than ${team.length + 1 - (teamToDrop.length + teamState.teamMembersGone.length)} on the call?)`
+        `Thanos Mode (less than ${team.length + 1 - (teamToDrop.length + regularOutOfOffice().length)} on the call?)`
       }
       </ButtonText>
     </Button>
