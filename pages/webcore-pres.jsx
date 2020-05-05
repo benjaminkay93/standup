@@ -14,7 +14,6 @@ const team = [
   'Carlos',
   'Callum',
   'Dave',
-  'Dom \'not\' the legend',
   'Edwina',
   'Jacob',
   'Joe',
