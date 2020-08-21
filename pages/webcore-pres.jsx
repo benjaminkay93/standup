@@ -96,7 +96,7 @@ const movePerson = ({ toGo, gone, standupPosition }) => ({
   gone: [...gone, standupPosition]
 })
 
-const standup = ({ toGo, excluding }) => {
+const selectTeamMember = ({ toGo, excluding }) => {
   const index = randomNumber({ max: toGo.length, excluding: excluding })
   return toGo[index]
 }
@@ -110,14 +110,15 @@ const Page = ({ team, gone = [], toGo }) => {
   const [url, setUrl] = useState('')
 
   const startStandup = () => {
-    const standupPosition = standup({ toGo })
-    setState({ ...state, active: true, standupPosition, nextPosition: standup({ toGo, excluding: standupPosition }) })
+    const standupPosition = selectTeamMember({ toGo: state.toGo })
+    const nextPosition = selectTeamMember({ toGo: state.toGo, excluding: standupPosition })
+    setState({ ...state, active: true, standupPosition, nextPosition })
   }
 
   const nextPerson = () => {
     const newState = movePerson(state)
     const newStandupPosition = state.nextPosition
-    const newNextPosition = standup({ toGo: newState.toGo, excluding: newState.toGo.indexOf(newStandupPosition) })
+    const newNextPosition = selectTeamMember({ toGo: newState.toGo, excluding: newState.toGo.indexOf(newStandupPosition) })
     setState({ ...newState, active: true, standupPosition: newStandupPosition, nextPosition: newNextPosition })
   }
 
