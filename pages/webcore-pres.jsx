@@ -14,7 +14,6 @@ const teamData = [
   'Caroline',
   'Dave L',
   'Dave M',
-  'Edwina',
   'Graeme',
   'Jacob',
   'Joe',
@@ -97,7 +96,7 @@ const movePerson = ({ toGo, gone, standupPosition }) => ({
   gone: [...gone, standupPosition]
 })
 
-const standup = ({ toGo, excluding }) => {
+const selectTeamMember = ({ toGo, excluding }) => {
   const index = randomNumber({ max: toGo.length, excluding: excluding })
   return toGo[index]
 }
@@ -106,19 +105,20 @@ const update = (current) => (
   <>Give your update: <StyledStrong>{current}</StyledStrong></>
 )
 
-const Page = ({ team, gone = [], toGo }) => {
-  const [state, setState] = useState({ toGo, gone })
+const Page = ({ team, initialGone = [], initialToGo }) => {
+  const [state, setState] = useState({ toGo: initialToGo, gone: initialGone })
   const [url, setUrl] = useState('')
 
   const startStandup = () => {
-    const standupPosition = standup({ toGo })
-    setState({ ...state, active: true, standupPosition, nextPosition: standup({ toGo, excluding: standupPosition }) })
+    const standupPosition = selectTeamMember({ toGo: state.toGo })
+    const nextPosition = selectTeamMember({ toGo: state.toGo, excluding: standupPosition })
+    setState({ ...state, active: true, standupPosition, nextPosition })
   }
 
   const nextPerson = () => {
     const newState = movePerson(state)
     const newStandupPosition = state.nextPosition
-    const newNextPosition = standup({ toGo: newState.toGo, excluding: newState.toGo.indexOf(newStandupPosition) })
+    const newNextPosition = selectTeamMember({ toGo: newState.toGo, excluding: newState.toGo.indexOf(newStandupPosition) })
     setState({ ...newState, active: true, standupPosition: newStandupPosition, nextPosition: newNextPosition })
   }
 
@@ -127,18 +127,18 @@ const Page = ({ team, gone = [], toGo }) => {
   }
 
   const toggleMember = (memberPosition) => () => {
-    let toGo
-    let gone
+    let updatedToGo
+    let updatedGone
 
     if (state.toGo.includes(memberPosition)) {
-      gone = [...state.gone, memberPosition]
-      toGo = state.toGo.filter(val => val !== memberPosition)
+      updatedGone = [...state.gone, memberPosition]
+      updatedToGo = state.toGo.filter(val => val !== memberPosition)
     } else {
-      toGo = [...state.toGo, memberPosition]
-      gone = state.gone.filter(val => val !== memberPosition)
+      updatedToGo = [...state.toGo, memberPosition]
+      updatedGone = state.gone.filter(val => val !== memberPosition)
     }
 
-    setState({ ...state, gone, toGo })
+    setState({ ...state, gone: updatedGone, toGo: updatedToGo })
   }
 
   if (typeof window !== 'undefined') {
@@ -201,9 +201,10 @@ const Page = ({ team, gone = [], toGo }) => {
 Page.getInitialProps = async (ctx) => {
   const goneString = ctx.query.gone || '[]'
   const goneObject = JSON.parse(goneString)
-  const gone = goneObject
-  const toGo = teamData.map((_, index) => index).filter((index) => !goneObject.includes(index))
-  return { team: teamData, gone, toGo }
+  const initialGone = goneObject
+  const initialToGo = teamData.map((_, index) => index).filter((index) => !goneObject.includes(index))
+
+  return { team: teamData, initialGone: initialGone, initialToGo: initialToGo }
 }
 
 export default Page
