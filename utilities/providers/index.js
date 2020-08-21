@@ -25,7 +25,7 @@ const darkTheme = {
     primary: '#eeeeee',
     highlight: 'darkgreen',
     antiHighlight: 'lightgreen',
-    upNext: 'gold'
+    upNext: 'DarkKhaki'
   },
   spacing: {
     base: '1rem'
